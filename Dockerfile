@@ -1,7 +1,7 @@
 FROM php:8.2-cli
 
 RUN apt-get update && apt-get install -y \
-    git curl libpng-dev libonig-dev libxml2-dev zip unzip libzip-dev libpq-dev
+    git curl libpng-dev libonig-dev libxml2-dev zip unzip libzip-dev libpq-dev nodejs npm
 
 RUN docker-php-ext-install pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd zip
 
@@ -12,6 +12,8 @@ WORKDIR /var/www
 COPY . .
 
 RUN composer install --optimize-autoloader --no-dev --ignore-platform-reqs
+
+RUN npm install && npm run build
 
 EXPOSE 10000
 
