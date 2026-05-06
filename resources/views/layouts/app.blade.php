@@ -18,6 +18,8 @@
         .navbar-user { color: #a0b0c8; font-size: 0.9rem; }
         .navbar-logout { color: #c9a84c; font-size: 0.85rem; text-decoration: none; border: 1px solid #c9a84c; padding: 6px 14px; border-radius: 4px; transition: all 0.2s; background: none; cursor: pointer; }
         .navbar-logout:hover { background: #c9a84c; color: #0f1f3d; }
+        .navbar-link { color: #a0b0c8; font-size: 0.9rem; text-decoration: none; transition: color 0.2s; }
+        .navbar-link:hover { color: #c9a84c; }
         .main-content { padding: 2rem; max-width: 1100px; margin: 0 auto; }
         .card { background: #ffffff; border: 1px solid #dce4f0; border-radius: 10px; padding: 1.8rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
         .card-title { font-family: 'Playfair Display', serif; color: #0f1f3d; font-size: 1.1rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #c9a84c; display: inline-block; }
@@ -57,6 +59,9 @@
         <a href="{{ route('conversations.index') }}" class="navbar-brand">Assist<span>IA</span></a>
         <div class="navbar-right">
             @auth
+                <a href="{{ route('dashboard') }}" class="navbar-link">Dashboard</a>
+                <a href="{{ route('conversations.index') }}" class="navbar-link">Conversas</a>
+                <a href="{{ route('organization.show') }}" class="navbar-link">🏢 Organização</a>
                 <span class="navbar-user">{{ Auth::user()->name }}</span>
                 <form method="POST" action="{{ route('logout') }}" style="margin:0">
                     @csrf

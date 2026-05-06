@@ -28,5 +28,14 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+// Organizações
+Route::get('/organization/create', [App\Http\Controllers\OrganizationController::class, 'create'])->name('organization.create');
+Route::post('/organization', [App\Http\Controllers\OrganizationController::class, 'store'])->name('organization.store');
+Route::get('/organization', [App\Http\Controllers\OrganizationController::class, 'show'])->name('organization.show');
+
+// Convites
+Route::get('/invitations/create', [App\Http\Controllers\InvitationController::class, 'create'])->name('invitations.create');
+Route::post('/invitations', [App\Http\Controllers\InvitationController::class, 'store'])->name('invitations.store');
+Route::get('/invitations/{token}/accept', [App\Http\Controllers\InvitationController::class, 'accept'])->name('invitations.accept');
 
 require __DIR__.'/auth.php';
