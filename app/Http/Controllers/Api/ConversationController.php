@@ -1,29 +1,25 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use Illuminate\Http\Request;
 
 class ConversationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $organization = auth()->user()->organization;
+        $organization = $request->user()->organization;
 
         if ($organization) {
             $conversations = Conversation::where('organization_id', $organization->id)
                 ->latest()->get();
         } else {
-            $conversations = auth()->user()->conversations()->latest()->get();
+            $conversations = $request->user()->conversations()->latest()->get();
         }
 
-        return view('conversations.index', compact('conversations'));
-    }
-
-    public function create()
-    {
-        return view('conversations.create');
+        return response()->json($conversations);
     }
 
     public function store(Request $request)
@@ -33,29 +29,27 @@ class ConversationController extends Controller
             'type' => 'required|in:meeting,chat',
         ]);
 
-        $organization = auth()->user()->organization;
+        $organization = $request->user()->organization;
 
-        Conversation::create([
-            'user_id' => auth()->id(),
+        $conversation = Conversation::create([
+            'user_id' => $request->user()->id,
             'organization_id' => $organization ? $organization->id : null,
             'title' => $request->title,
             'type' => $request->type,
         ]);
 
-        return redirect()->route('conversations.index');
+        return response()->json($conversation, 201);
     }
 
     public function show(Conversation $conversation)
     {
-        $messages = $conversation->messages()->latest()->get();
-        $tasks = $conversation->tasks()->latest()->get();
-        return view('conversations.show', compact('conversation', 'messages', 'tasks'));
+        return response()->json($conversation->load('messages', 'tasks'));
     }
 
     public function destroy(Conversation $conversation)
     {
         $conversation->delete();
-        return redirect()->route('conversations.index');
+        return response()->json(['message' => 'Conversa apagada com sucesso']);
     }
 
     public function summarize(Conversation $conversation)
@@ -63,7 +57,7 @@ class ConversationController extends Controller
         $messages = $conversation->messages()->get();
 
         if ($messages->isEmpty()) {
-            return back()->with('error', 'Não há mensagens para resumir.');
+            return response()->json(['message' => 'Não há mensagens para resumir.'], 400);
         }
 
         $text = $messages->map(function ($m) {
@@ -102,11 +96,10 @@ Conversa a analisar:
 
         if ($summary) {
             $conversation->update(['summary' => $summary]);
-            $conversation->refresh();
-            return redirect()->route('conversations.show', $conversation)->with('success', 'Resumo gerado com sucesso!');
+            return response()->json(['summary' => $summary]);
         }
 
-        return back()->with('error', 'Não foi possível gerar o resumo. Tenta novamente.');
+        return response()->json(['message' => 'Não foi possível gerar o resumo.'], 500);
     }
 
     public function extractTasks(Conversation $conversation)
@@ -114,7 +107,7 @@ Conversa a analisar:
         $messages = $conversation->messages()->get();
 
         if ($messages->isEmpty()) {
-            return back()->with('error', 'Não há mensagens para analisar.');
+            return response()->json(['message' => 'Não há mensagens para analisar.'], 400);
         }
 
         $text = $messages->map(function ($m) {
@@ -146,10 +139,9 @@ Conversa a analisar:
                     'status' => 'pending',
                 ]);
             }
-            return redirect()->route('conversations.show', $conversation)
-                ->with('success', count($tasks) . ' tarefa(s) criada(s) automaticamente!');
+            return response()->json(['message' => count($tasks) . ' tarefa(s) criada(s) automaticamente!']);
         }
 
-        return back()->with('error', 'Não foi possível extrair tarefas.');
+        return response()->json(['message' => 'Não foi possível extrair tarefas.'], 500);
     }
 }
