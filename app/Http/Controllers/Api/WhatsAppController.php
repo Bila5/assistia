@@ -1,39 +1,35 @@
-<?php
-
+﻿<?php
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Conversation;
-use App\Models\Message;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 
 class WhatsAppController extends Controller
 {
     public function webhook(Request $request)
     {
-        $from = $request->input('From'); // número do remetente
-        $body = $request->input('Body'); // conteúdo da mensagem
+        $from        = $request->input('From');
+        $body        = $request->input('Body');
         $profileName = $request->input('ProfileName', 'WhatsApp User');
 
         if (!$from || !$body) {
-            return response()->json(['message' => 'Invalid request'], 400);
+            return response('<?xml version="1.0" encoding="UTF-8"?><Response></Response>', 400)
+                ->header('Content-Type', 'text/xml');
         }
 
-        // Encontrar ou criar conversa para este número
         $conversation = Conversation::firstOrCreate(
             ['whatsapp_from' => $from],
             [
-                'title' => 'WhatsApp - ' . $profileName,
-                'type' => 'chat',
-                'user_id' => 1, // utilizador admin por defeito
+                'title'   => 'WhatsApp - ' . $profileName,
+                'type'    => 'whatsapp',
+                'user_id' => 1,
             ]
         );
 
-        // Guardar a mensagem
         $conversation->messages()->create([
-            'sender_name' => $profileName,
-            'content' => $body,
+            'content'     => $body,
+            'sender_role' => 'user',
         ]);
 
         return response('<?xml version="1.0" encoding="UTF-8"?><Response></Response>', 200)
