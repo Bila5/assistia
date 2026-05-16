@@ -24,6 +24,9 @@ return Application::configure(basePath: dirname(__DIR__))
             "cache.headers" => \Illuminate\Http\Middleware\SetCacheHeaders::class,
             "role" => \App\Http\Middleware\CheckRole::class,
         ]);
+        $middleware->api(prepend: [
+            \Illuminate\Http\Middleware\HandleCors::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (\Throwable $e, Request $request) {
