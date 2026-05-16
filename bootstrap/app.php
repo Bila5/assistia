@@ -6,42 +6,31 @@ use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        api: __DIR__.'/../routes/api.php',
-        commands: __DIR__.'/../routes/console.php',
-        health: '/up',
+        web: __DIR__."/../routes/web.php",
+        api: __DIR__."/../routes/api.php",
+        commands: __DIR__."/../routes/console.php",
+        health: "/up",
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'auth' => \App\Http\Middleware\Authenticate::class,
-            'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
-            'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
-            'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
-            'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-            'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
-            'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
-            'can' => \Illuminate\Auth\Middleware\Authorize::class,
-            'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
-            'role' => \App\Http\Middleware\CheckRole::class,
+            "auth" => \App\Http\Middleware\Authenticate::class,
+            "auth.basic" => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
+            "auth.session" => \Illuminate\Session\Middleware\AuthenticateSession::class,
+            "guest" => \App\Http\Middleware\RedirectIfAuthenticated::class,
+            "verified" => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+            "throttle" => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+            "signed" => \Illuminate\Routing\Middleware\ValidateSignature::class,
+            "can" => \Illuminate\Auth\Middleware\Authorize::class,
+            "cache.headers" => \Illuminate\Http\Middleware\SetCacheHeaders::class,
+            "role" => \App\Http\Middleware\CheckRole::class,
         ]);
-        $middleware->web(append: [
-            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            \Illuminate\Session\Middleware\StartSession::class,
-            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        ]);
-        $middleware->api(prepend: [
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        ]);
-        $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (\Throwable $e, Request $request) {
-            if ($request->is('api/*')) {
+            if ($request->is("api/*")) {
                 return response()->json([
-                    'message' => $e->getMessage(),
-                ], method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500);
+                    "message" => $e->getMessage(),
+                ], method_exists($e, "getStatusCode") ? $e->getStatusCode() : 500);
             }
         });
     })->create();
